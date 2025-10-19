@@ -224,6 +224,26 @@ speedBtn.TextScaled = true
 speedBtn.TextColor3 = Color3.new(1, 1, 1)
 Instance.new("UICorner", speedBtn).CornerRadius = UDim.new(0, 6)
 
+local noclipBtn = Instance.new("TextButton", playerTab)
+noclipBtn.Size = UDim2.new(0, 100, 0, 35)
+noclipBtn.Position = UDim2.new(0, 0, 0, 135)
+noclipBtn.Text = "Noclip"
+noclipBtn.BackgroundColor3 = Color3.fromRGB(255, 100, 100)
+noclipBtn.Font = Enum.Font.FredokaOne
+noclipBtn.TextScaled = true
+noclipBtn.TextColor3 = Color3.new(1, 1, 1)
+Instance.new("UICorner", noclipBtn).CornerRadius = UDim.new(0, 6)
+
+local fullbrightBtn = Instance.new("TextButton", playerTab)
+fullbrightBtn.Size = UDim2.new(0, 100, 0, 35)
+fullbrightBtn.Position = UDim2.new(0, 0, 0, 180)
+fullbrightBtn.Text = "FullBright"
+fullbrightBtn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+fullbrightBtn.Font = Enum.Font.FredokaOne
+fullbrightBtn.TextScaled = true
+fullbrightBtn.TextColor3 = Color3.fromRGB(0,0,0)
+Instance.new("UICorner", fullbrightBtn).CornerRadius = UDim.new(0, 6)
+
 -- Friends Tab (YouFriend)
 local friendsTab = Instance.new("Frame", contentFrame)
 friendsTab.Size = UDim2.new(1,0,1,0)
@@ -387,15 +407,60 @@ speedBtn.MouseButton1Click:Connect(function()
     else stopSpeed() speedBtn.BackgroundColor3=Color3.fromRGB(255,200,100) end
 end)
 
--- InfoServer Auto Update
-spawn(function()
-    while wait(3) do
-        if infoServerTab.Visible then
-            infoServerText.Text = "🌐 Server: "..tostring(game.PlaceId).."\nPlayers: "..#Players:GetPlayers()
+local noclipEnabled = false
+local noclipConnection
+noclipBtn.MouseButton1Click:Connect(function()
+    noclipEnabled = not noclipEnabled
+    local char = player.Character
+    if not char then return end
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    if not hum then return end
+    if noclipEnabled then
+        noclipConnection = RunService.Stepped:Connect(function()
+            for _, part in pairs(char:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = false
+                end
+            end
+        end)
+        noclipBtn.BackgroundColor3 = Color3.fromRGB(255,150,150)
+    else
+        if noclipConnection then noclipConnection:Disconnect() noclipConnection=nil end
+        for _, part in pairs(char:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.CanCollide = true
+            end
         end
+        noclipBtn.BackgroundColor3 = Color3.fromRGB(255,100,100)
     end
 end)
 
+local fullbrightEnabled = false
+local originalLighting = {
+    Brightness = game.Lighting.Brightness,
+    ClockTime = game.Lighting.ClockTime,
+    FogEnd = game.Lighting.FogEnd,
+    Ambient = game.Lighting.Ambient
+}
+
+fullbrightBtn.MouseButton1Click:Connect(function()
+    fullbrightEnabled = not fullbrightEnabled
+    if fullbrightEnabled then
+        game.Lighting.Brightness = 2
+        game.Lighting.ClockTime = 14
+        game.Lighting.FogEnd = 100000
+        game.Lighting.Ambient = Color3.new(1,1,1)
+        fullbrightBtn.BackgroundColor3 = Color3.fromRGB(200,200,200)
+    else
+        game.Lighting.Brightness = originalLighting.Brightness
+        game.Lighting.ClockTime = originalLighting.ClockTime
+        game.Lighting.FogEnd = originalLighting.FogEnd
+        game.Lighting.Ambient = originalLighting.Ambient
+        fullbrightBtn.BackgroundColor3 = Color3.fromRGB(255,255,255)
+    end
+end)
 -- YouFriend Auto Update (ví dụ kiểm tra bạn bè unfriend)
 local trackedFriends = {} -- danh sách tên bạn đã theo dõi
 spawn(function()
@@ -410,6 +475,15 @@ spawn(function()
                 addFriendLabel(name)
                 trackedFriends[name] = nil
             end
+        end
+    end
+end)
+
+-- InfoServer Auto Update
+spawn(function()
+    while wait(3) do
+        if infoServerTab.Visible then
+            infoServerText.Text = "🌐 Server: "..tostring(game.PlaceId).."\nPlayers: "..#Players:GetPlayers()
         end
     end
 end)
