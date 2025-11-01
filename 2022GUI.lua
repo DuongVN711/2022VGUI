@@ -1,9 +1,14 @@
+-- FULL CLEAN GUI (YouFriend removed, Music added, fixes)
 -- SERVICES
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local player = Players.LocalPlayer
 local camera = workspace.CurrentCamera
+
+-- REMOVE OLD GUI TO AVOID DUPLICATES
+local existing = player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("MobileGui")
+if existing then existing:Destroy() end
 
 -- GUI SETUP
 local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
@@ -59,51 +64,25 @@ tabLayout.FillDirection = Enum.FillDirection.Horizontal
 tabLayout.SortOrder = Enum.SortOrder.LayoutOrder
 tabLayout.Padding = UDim.new(0, 10)
 
--- Tab Buttons
-local infoTabBtn = Instance.new("TextButton", tabBar)
-infoTabBtn.Size = UDim2.new(0, 100, 1, 0)
-infoTabBtn.Text = "Info"
-infoTabBtn.Font = Enum.Font.FredokaOne
-infoTabBtn.TextScaled = true
-infoTabBtn.TextColor3 = Color3.new(0, 0, 0)
-infoTabBtn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-Instance.new("UICorner", infoTabBtn).CornerRadius = UDim.new(0, 6)
+-- Tab Buttons (Info, InfoServer, Script, Player, Music)
+local function makeTabBtn(text, width)
+    local w = width or 100
+    local btn = Instance.new("TextButton", tabBar)
+    btn.Size = UDim2.new(0, w, 1, 0)
+    btn.Text = text
+    btn.Font = Enum.Font.FredokaOne
+    btn.TextScaled = true
+    btn.TextColor3 = Color3.new(0,0,0)
+    btn.BackgroundColor3 = Color3.fromRGB(255,255,255)
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0,6)
+    return btn
+end
 
-local infoServerTabBtn = Instance.new("TextButton", tabBar)
-infoServerTabBtn.Size = UDim2.new(0, 120, 1, 0)
-infoServerTabBtn.Text = "InfoServer"
-infoServerTabBtn.Font = Enum.Font.FredokaOne
-infoServerTabBtn.TextScaled = true
-infoServerTabBtn.TextColor3 = Color3.new(0, 0, 0)
-infoServerTabBtn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-Instance.new("UICorner", infoServerTabBtn).CornerRadius = UDim.new(0, 6)
-
-local scriptTabBtn = Instance.new("TextButton", tabBar)
-scriptTabBtn.Size = UDim2.new(0, 100, 1, 0)
-scriptTabBtn.Text = "Script"
-scriptTabBtn.Font = Enum.Font.FredokaOne
-scriptTabBtn.TextScaled = true
-scriptTabBtn.TextColor3 = Color3.new(0, 0, 0)
-scriptTabBtn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-Instance.new("UICorner", scriptTabBtn).CornerRadius = UDim.new(0, 6)
-
-local playerTabBtn = Instance.new("TextButton", tabBar)
-playerTabBtn.Size = UDim2.new(0, 100, 1, 0)
-playerTabBtn.Text = "Player"
-playerTabBtn.Font = Enum.Font.FredokaOne
-playerTabBtn.TextScaled = true
-playerTabBtn.TextColor3 = Color3.new(0, 0, 0)
-playerTabBtn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-Instance.new("UICorner", playerTabBtn).CornerRadius = UDim.new(0, 6)
-
-local friendsTabBtn = Instance.new("TextButton", tabBar)
-friendsTabBtn.Size = UDim2.new(0, 120, 1, 0)
-friendsTabBtn.Text = "YouFriend"
-friendsTabBtn.Font = Enum.Font.FredokaOne
-friendsTabBtn.TextScaled = true
-friendsTabBtn.TextColor3 = Color3.new(0, 0, 0)
-friendsTabBtn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-Instance.new("UICorner", friendsTabBtn).CornerRadius = UDim.new(0, 6)
+local infoTabBtn = makeTabBtn("Info", 100)
+local infoServerTabBtn = makeTabBtn("InfoServer", 120)
+local scriptTabBtn = makeTabBtn("Script", 100)
+local playerTabBtn = makeTabBtn("Player", 100)
+local musicTabBtn = makeTabBtn("Music", 100)
 
 -- CONTENT HOLDER
 local contentFrame = Instance.new("Frame", mainFrame)
@@ -122,7 +101,7 @@ inputBox.Size = UDim2.new(1, -130, 1, -50)
 inputBox.Position = UDim2.new(0, 0, 0, 0)
 inputBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 inputBox.TextColor3 = Color3.new(1, 1, 1)
-inputBox.PlaceholderText = "-- use you script in here"
+inputBox.PlaceholderText = "-- use your script here"
 inputBox.Font = Enum.Font.Code
 inputBox.TextSize = 18
 inputBox.TextXAlignment = Enum.TextXAlignment.Left
@@ -132,7 +111,7 @@ inputBox.ClearTextOnFocus = false
 inputBox.MultiLine = true
 Instance.new("UICorner", inputBox).CornerRadius = UDim.new(0, 6)
 
-local runBtn = Instance.new("TextButton",scriptTab)
+local runBtn = Instance.new("TextButton", scriptTab)
 runBtn.Size = UDim2.new(0, 90, 0, 35)
 runBtn.Position = UDim2.new(1, -100, 1, -40)
 runBtn.Text = "Run"
@@ -145,7 +124,7 @@ Instance.new("UICorner", runBtn).CornerRadius = UDim.new(0, 6)
 local clearBtn = Instance.new("TextButton", scriptTab)
 clearBtn.Size = UDim2.new(0, 90, 0, 35)
 clearBtn.Position = UDim2.new(1, -200, 1, -40)
-clearBtn.Text = "delete"
+clearBtn.Text = "Delete"
 clearBtn.Font = Enum.Font.FredokaOne
 clearBtn.TextScaled = true
 clearBtn.TextColor3 = Color3.new(1, 1, 1)
@@ -167,7 +146,7 @@ infoText.Font = Enum.Font.FredokaOne
 infoText.TextColor3 = Color3.new(1, 1, 1)
 infoText.TextScaled = false
 infoText.TextSize = 16
-infoText.Text = "Script by???\n\n- Tab Script:???\n- Tab Player:???\n- Tab Info:???\n- Tab YouFriend:???(beta)\n\nthx for use my gui!"
+infoText.Text = "Script by ???\n\n- Tab Script: ???\n- Tab Player: ???\n- Tab Info: ???\n\nThx for using my GUI!"
 infoText.BackgroundTransparency = 1
 
 -- InfoServer Tab
@@ -185,7 +164,7 @@ infoServerText.Font = Enum.Font.FredokaOne
 infoServerText.TextColor3 = Color3.new(1, 1, 1)
 infoServerText.TextScaled = false
 infoServerText.TextSize = 16
-infoServerText.Text = "🔍 wait info server..."
+infoServerText.Text = "🔍 Wait info server..."
 infoServerText.BackgroundTransparency = 1
 
 -- Player Tab
@@ -244,49 +223,83 @@ fullbrightBtn.TextScaled = true
 fullbrightBtn.TextColor3 = Color3.fromRGB(0,0,0)
 Instance.new("UICorner", fullbrightBtn).CornerRadius = UDim.new(0, 6)
 
--- Friends Tab (YouFriend)
-local friendsTab = Instance.new("Frame", contentFrame)
-friendsTab.Size = UDim2.new(1,0,1,0)
-friendsTab.BackgroundTransparency = 1
-friendsTab.Visible = false
+-- MUSIC TAB (client-only)
+local musicTab = Instance.new("Frame", contentFrame)
+musicTab.Size = UDim2.new(1,0,1,0)
+musicTab.BackgroundTransparency = 1
+musicTab.Visible = false
 
-local friendsScroll = Instance.new("ScrollingFrame", friendsTab)
-friendsScroll.Size = UDim2.new(1,-20,1,-20)
-friendsScroll.Position = UDim2.new(0,10,0,10)
-friendsScroll.BackgroundTransparency = 0.9
-friendsScroll.ScrollBarThickness = 10
-Instance.new("UICorner", friendsScroll).CornerRadius = UDim.new(0,6)
+local musicNameBox = Instance.new("TextBox", musicTab)
+musicNameBox.Size = UDim2.new(0.7,0,0,40)
+musicNameBox.Position = UDim2.new(0,0,0,0)
+musicNameBox.PlaceholderText = "Nhập ID nhạc (số)"
+musicNameBox.TextColor3 = Color3.new(1,1,1)
+musicNameBox.BackgroundColor3 = Color3.fromRGB(50,50,50)
+musicNameBox.Font = Enum.Font.Code
+musicNameBox.TextSize = 18
+Instance.new("UICorner", musicNameBox).CornerRadius = UDim.new(0,6)
 
-local friendsLayout = Instance.new("UIListLayout", friendsScroll)
-friendsLayout.SortOrder = Enum.SortOrder.LayoutOrder
-friendsLayout.Padding = UDim.new(0,5)
+local musicToggleBtn = Instance.new("TextButton", musicTab)
+musicToggleBtn.Size = UDim2.new(0.25,0,0,40)
+musicToggleBtn.Position = UDim2.new(0.72,0,0,0)
+musicToggleBtn.Text = "OFF"
+musicToggleBtn.Font = Enum.Font.FredokaOne
+musicToggleBtn.TextScaled = true
+musicToggleBtn.TextColor3 = Color3.new(1,1,1)
+musicToggleBtn.BackgroundColor3 = Color3.fromRGB(200,50,50)
+Instance.new("UICorner", musicToggleBtn).CornerRadius = UDim.new(0,6)
 
-local function addFriendLabel(name)
-    local label = Instance.new("TextLabel", friendsScroll)
-    label.Size = UDim2.new(1,-10,0,30)
-    label.Text = "❌ "..name.." Beta not real!"
-    label.Font = Enum.Font.FredokaOne
-    label.TextScaled = true
-    label.TextColor3 = Color3.fromRGB(255,100,100)
-    label.BackgroundTransparency = 0.8
-    Instance.new("UICorner", label).CornerRadius = UDim.new(0,6)
-    friendsScroll.CanvasSize = UDim2.new(0,0,0,friendsLayout.AbsoluteContentSize.Y + 10)
+local sound = Instance.new("Sound", player:WaitForChild("PlayerGui"))
+sound.Looped = true
+sound.Volume = 1
+
+-- SAFETY: validate numeric ID input
+local function validId(text)
+    local n = tonumber(text)
+    if n and n > 0 then return tostring(math.floor(n)) end
+    return nil
 end
 
--- TAB SWITCHING
+local musicEnabled = false
+musicToggleBtn.MouseButton1Click:Connect(function()
+    musicEnabled = not musicEnabled
+    if musicEnabled then
+        local idStr = validId(musicNameBox.Text)
+        if idStr then
+            sound.SoundId = "rbxassetid://"..idStr
+            pcall(function() sound:Play() end)
+            musicToggleBtn.Text = "ON"
+            musicToggleBtn.BackgroundColor3 = Color3.fromRGB(50,200,50)
+        else
+            -- invalid id: disable and notify briefly
+            musicEnabled = false
+            musicToggleBtn.Text = "OFF"
+            musicToggleBtn.BackgroundColor3 = Color3.fromRGB(200,50,50)
+            -- small feedback: change placeholder
+            musicNameBox.Text = ""
+            musicNameBox.PlaceholderText = "ID không hợp lệ"
+        end
+    else
+        pcall(function() sound:Stop() end)
+        musicToggleBtn.Text = "OFF"
+        musicToggleBtn.BackgroundColor3 = Color3.fromRGB(200,50,50)
+    end
+end)
+
+-- TAB SWITCHING (single function, safe)
 local function showTab(tab)
     scriptTab.Visible = (tab == "Script")
     infoTab.Visible = (tab == "Info")
     infoServerTab.Visible = (tab == "InfoServer")
     playerTab.Visible = (tab == "Player")
-    friendsTab.Visible = (tab == "YouFriend")
+    musicTab.Visible = (tab == "Music")
 end
 
 scriptTabBtn.MouseButton1Click:Connect(function() showTab("Script") end)
 infoTabBtn.MouseButton1Click:Connect(function() showTab("Info") end)
 infoServerTabBtn.MouseButton1Click:Connect(function() showTab("InfoServer") end)
 playerTabBtn.MouseButton1Click:Connect(function() showTab("Player") end)
-friendsTabBtn.MouseButton1Click:Connect(function() showTab("YouFriend") end)
+musicTabBtn.MouseButton1Click:Connect(function() showTab("Music") end)
 
 -- MINI / CLOSE
 closeBtn.MouseButton1Click:Connect(function()
@@ -302,17 +315,23 @@ end)
 runBtn.MouseButton1Click:Connect(function()
     local code = inputBox.Text
     local func, err = loadstring(code)
-    if func then pcall(func)
-    else warn("Lỗi: "..tostring(err)) end
+    if func then
+        local ok, e = pcall(func)
+        if not ok then warn("Runtime error: "..tostring(e)) end
+    else
+        warn("Compile error: "..tostring(err))
+    end
 end)
 clearBtn.MouseButton1Click:Connect(function() inputBox.Text = "" end)
 
--- ESP
+-- ESP implementation
 local espEnabled = false
 local espBoxes = {}
 local function createEspBox(char)
+    if not (char and char:FindFirstChild("HumanoidRootPart")) then return end
     local box = Instance.new("BoxHandleAdornment")
-    box.Adornee = char:WaitForChild("HumanoidRootPart")
+    box.Name = "ESP_BOX"
+    box.Adornee = char:FindFirstChild("HumanoidRootPart")
     box.Size = Vector3.new(4,6,4)
     box.Color3 = Color3.fromRGB(255,0,0)
     box.AlwaysOnTop = true
@@ -322,21 +341,25 @@ local function createEspBox(char)
     return box
 end
 local function removeEsp()
-    for _,b in pairs(espBoxes) do b:Destroy() end
+    for _,b in pairs(espBoxes) do
+        if b and b.Parent then pcall(function() b:Destroy() end) end
+    end
     espBoxes = {}
 end
-local function updateEsp()
+local function updateEspAll()
     removeEsp()
     for _,p in pairs(Players:GetPlayers()) do
         if p ~= player and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
-            table.insert(espBoxes, createEspBox(p.Character))
+            local b = createEspBox(p.Character)
+            if b then table.insert(espBoxes, b) end
         end
     end
 end
+
 espBtn.MouseButton1Click:Connect(function()
     espEnabled = not espEnabled
     if espEnabled then
-        updateEsp()
+        updateEspAll()
         espBtn.BackgroundColor3 = Color3.fromRGB(150,150,255)
     else
         removeEsp()
@@ -344,151 +367,138 @@ espBtn.MouseButton1Click:Connect(function()
     end
 end)
 
--- FLY
+-- FLY implementation (safe bind/unbind names)
 local flyEnabled = false
-local flyConnection
-flyBtn.MouseButton1Click:Connect(function()
-    flyEnabled = not flyEnabled
-    local char = player.Character
-    if not char then return end
-    local root = char:FindFirstChild("HumanoidRootPart")
-    if not root then return end
-    if flyEnabled then
-        local bv = Instance.new("BodyVelocity")
-        bv.Name = "FlyVelocity"
-        bv.MaxForce = Vector3.new(1e5,1e5,1e5)
-        bv.Velocity = Vector3.zero
-        bv.Parent = root
-        flyConnection = RunService.Heartbeat:Connect(function()
-            if not flyEnabled then
-                if flyConnection then flyConnection:Disconnect() flyConnection=nil end
-                if bv then bv:Destroy() end
-                return
-            end
-            local move = Vector3.zero
-            if UserInputService:IsKeyDown(Enum.KeyCode.W) then move += camera.CFrame.LookVector end
-            if UserInputService:IsKeyDown(Enum.KeyCode.S) then move -= camera.CFrame.LookVector end
-            if UserInputService:IsKeyDown(Enum.KeyCode.A) then move -= camera.CFrame.RightVector end
-            if UserInputService:IsKeyDown(Enum.KeyCode.D) then move += camera.CFrame.RightVector end
-            if UserInputService:IsKeyDown(Enum.KeyCode.Space)
-then move += Vector3.new(0,1,0) end
-            if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then move -= Vector3.new(0,1,0) end
-            bv.Velocity = move.Magnitude>0 and move.Unit*50 or Vector3.zero
-        end)
-    else
-        if flyConnection then flyConnection:Disconnect() flyConnection=nil end
-        local bv = root:FindFirstChild("FlyVelocity")
-        if bv then bv:Destroy() end
-    end
-    flyBtn.BackgroundColor3 = flyEnabled and Color3.fromRGB(150,255,150) or Color3.fromRGB(100,255,100)
-end)
-
--- SPEED
-local speedEnabled = false
-local speedValue = 100
-local speedConnection
-local function startSpeed()
-    if speedConnection then return end
-    local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
-    if not humanoid then return end
-    speedConnection = RunService.Heartbeat:Connect(function()
-        if humanoid and speedEnabled then humanoid.WalkSpeed = speedValue end
-    end)
-end
-local function stopSpeed()
-    speedEnabled = false
-    local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
-    if humanoid then humanoid.WalkSpeed = 16 end
-    if speedConnection then speedConnection:Disconnect() speedConnection=nil end
-end
-speedBtn.MouseButton1Click:Connect(function()
-    speedEnabled = not speedEnabled
-    if speedEnabled then startSpeed() speedBtn.BackgroundColor3=Color3.fromRGB(255,255,100)
-    else stopSpeed() speedBtn.BackgroundColor3=Color3.fromRGB(255,200,100) end
-end)
-
-local noclipEnabled = false
-local noclipConnection
-noclipBtn.MouseButton1Click:Connect(function()
-    noclipEnabled = not noclipEnabled
+local function enableFly()
     local char = player.Character
     if not char then return end
     local hrp = char:FindFirstChild("HumanoidRootPart")
     if not hrp then return end
-    local hum = char:FindFirstChildOfClass("Humanoid")
-    if not hum then return end
-    if noclipEnabled then
-        noclipConnection = RunService.Stepped:Connect(function()
-            for _, part in pairs(char:GetDescendants()) do
-                if part:IsA("BasePart") then
-                    part.CanCollide = false
+    local bv = hrp:FindFirstChild("FlyVelocity") or Instance.new("BodyVelocity", hrp)
+    bv.Name = "FlyVelocity"
+    bv.MaxForce = Vector3.new(1e5,1e5,1e5)
+    bv.Velocity = Vector3.zero
+    RunService:BindToRenderStep("CustomFly", Enum.RenderPriority.Character.Value+1, function()
+        if not flyEnabled or not hrp then return end
+        local mv = Vector3.zero
+        if UserInputService:IsKeyDown(Enum.KeyCode.W) then mv += workspace.CurrentCamera.CFrame.LookVector end
+        if UserInputService:IsKeyDown(Enum.KeyCode.S) then mv -= workspace.CurrentCamera.CFrame.LookVector end
+        if UserInputService:IsKeyDown(Enum.KeyCode.A) then mv -= workspace.CurrentCamera.CFrame.RightVector end
+        if UserInputService:IsKeyDown(Enum.KeyCode.D) then mv += workspace.CurrentCamera.CFrame.RightVector end
+        if UserInputService:IsKeyDown(Enum.KeyCode.Space) then mv += Vector3.new(0,1,0) end
+        if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then mv -= Vector3.new(0,1,0) end
+        bv.Velocity = (mv.Magnitude>0) and mv.Unit * 50 or Vector3.zero
+    end)
+end
+local function disableFly()
+    RunService:UnbindFromRenderStep("CustomFly")
+    local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+    if hrp then
+        local bv = hrp:FindFirstChild("FlyVelocity")
+        if bv then pcall(function() bv:Destroy() end) end
+    end
+end
+
+flyBtn.MouseButton1Click:Connect(function()
+    flyEnabled = not flyEnabled
+    if flyEnabled then enableFly() flyBtn.BackgroundColor3 = Color3.fromRGB(150,255,150)
+    else disableFly() flyBtn.BackgroundColor3 = Color3.fromRGB(100,255,100) end
+end)
+
+-- SPEED toggle (safe restore)
+local speedActive = false
+local defaultWalk = 16
+speedBtn.MouseButton1Click:Connect(function()
+    speedActive = not speedActive
+    local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+    if hum then
+        if speedActive then
+            hum.WalkSpeed = 100
+            speedBtn.BackgroundColor3 = Color3.fromRGB(255,255,100)
+        else
+            hum.WalkSpeed = defaultWalk
+            speedBtn.BackgroundColor3 = Color3.fromRGB(255,200,100)
+        end
+    end
+end)
+
+-- NOCLIP toggle (Bind/Unbind safe)
+local noclipActive = false
+noclipBtn.MouseButton1Click:Connect(function()
+    noclipActive = not noclipActive
+    if noclipActive then
+        RunService:BindToRenderStep("CustomNoclip", Enum.RenderPriority.Character.Value+2, function()
+            if player.Character then
+                for _,part in pairs(player.Character:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part.CanCollide = false
+                    end
                 end
             end
         end)
         noclipBtn.BackgroundColor3 = Color3.fromRGB(255,150,150)
     else
-        if noclipConnection then noclipConnection:Disconnect() noclipConnection=nil end
-        for _, part in pairs(char:GetDescendants()) do
-            if part:IsA("BasePart") then
-                part.CanCollide = true
+        RunService:UnbindFromRenderStep("CustomNoclip")
+        if player.Character then
+            for _,part in pairs(player.Character:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = true
+                end
             end
         end
         noclipBtn.BackgroundColor3 = Color3.fromRGB(255,100,100)
     end
 end)
 
-local fullbrightEnabled = false
-local originalLighting = {
-    Brightness = game.Lighting.Brightness,
-    ClockTime = game.Lighting.ClockTime,
-    FogEnd = game.Lighting.FogEnd,
-    Ambient = game.Lighting.Ambient
+-- FULLBRIGHT toggle (store/restore)
+local fullbrightActive = false
+local backupLighting = {
+    Brightness = game:GetService("Lighting").Brightness,
+    ClockTime = game:GetService("Lighting").ClockTime,
+    FogEnd = game:GetService("Lighting").FogEnd,
+    Ambient = game:GetService("Lighting").Ambient
 }
-
 fullbrightBtn.MouseButton1Click:Connect(function()
-    fullbrightEnabled = not fullbrightEnabled
-    if fullbrightEnabled then
-        game.Lighting.Brightness = 2
-        game.Lighting.ClockTime = 14
-        game.Lighting.FogEnd = 100000
-        game.Lighting.Ambient = Color3.new(1,1,1)
+    fullbrightActive = not fullbrightActive
+    local L = game:GetService("Lighting")
+    if fullbrightActive then
+        L.Brightness = 2
+        L.ClockTime = 14
+        L.FogEnd = 100000
+        L.Ambient = Color3.new(1,1,1)
         fullbrightBtn.BackgroundColor3 = Color3.fromRGB(200,200,200)
     else
-        game.Lighting.Brightness = originalLighting.Brightness
-        game.Lighting.ClockTime = originalLighting.ClockTime
-        game.Lighting.FogEnd = originalLighting.FogEnd
-        game.Lighting.Ambient = originalLighting.Ambient
+        L.Brightness = backupLighting.Brightness
+        L.ClockTime = backupLighting.ClockTime
+        L.FogEnd = backupLighting.FogEnd
+        L.Ambient = backupLighting.Ambient
         fullbrightBtn.BackgroundColor3 = Color3.fromRGB(255,255,255)
     end
 end)
--- YouFriend Auto Update (ví dụ kiểm tra bạn bè unfriend)
-local trackedFriends = {} -- danh sách tên bạn đã theo dõi
-spawn(function()
-    while wait(5) do
-        local currentFriends = {} -- giả lập get friends (thay bằng API thật nếu có)
-        for _,p in pairs(Players:GetPlayers()) do
-            currentFriends[p.Name] = true
+
+-- RESPOND TO NEW PLAYERS / CHARACTERS FOR ESP
+Players.PlayerAdded:Connect(function(plr)
+    plr.CharacterAdded:Connect(function(char)
+        if espEnabled and plr ~= player and char:FindFirstChild("HumanoidRootPart") then
+            local b = createEspBox(char)
+            if b then table.insert(espBoxes, b) end
         end
-        -- kiểm tra ai unfriend
-        for name,_ in pairs(trackedFriends) do
-            if not currentFriends[name] then
-                addFriendLabel(name)
-                trackedFriends[name] = nil
-            end
+    end)
+end)
+
+player.CharacterAdded:Connect(function(char)
+    wait(0.5)
+    if espEnabled then updateEspAll() end
+end)
+
+-- INFO SERVER AUTO UPDATE (safe)
+spawn(function()
+    while true do
+        wait(3)
+        if infoServerTab and infoServerTab.Parent and infoServerTab.Visible then
+            infoServerText.Text = "🌐 Server: "..tostring(game.PlaceId).."\nPlayers: "..tostring(#Players:GetPlayers())
         end
     end
 end)
 
--- InfoServer Auto Update
-spawn(function()
-    while wait(3) do
-        if infoServerTab.Visible then
-            infoServerText.Text = "🌐 Server: "..tostring(game.PlaceId).."\nPlayers: "..#Players:GetPlayers()
-        end
-    end
-end)
-
--- Khởi tạo trackedFriends ví dụ
-for _,p in pairs(Players:GetPlayers()) do
-    if p ~= player then trackedFriends[p.Name] = true end
-end
+print("GUI loaded successfully ✅")
