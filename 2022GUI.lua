@@ -146,7 +146,7 @@ infoText.Font = Enum.Font.FredokaOne
 infoText.TextColor3 = Color3.new(1, 1, 1)
 infoText.TextScaled = false
 infoText.TextSize = 16
-infoText.Text = "Script by ???\n\n- Tab Script: ???\n- Tab Player: ???\n- Tab Info: ???\n\nThx for using my GUI!"
+infoText.Text = "Script by 2022VCOOL\n\n- tiktok 2022Vcool\n- Script beta\n- ⚠️script not have bypass anticheat\n\nThx for using my GUI"
 infoText.BackgroundTransparency = 1
 
 -- InfoServer Tab
@@ -413,7 +413,7 @@ speedBtn.MouseButton1Click:Connect(function()
     local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
     if hum then
         if speedActive then
-            hum.WalkSpeed = 100
+            hum.WalkSpeed = 125
             speedBtn.BackgroundColor3 = Color3.fromRGB(255,255,100)
         else
             hum.WalkSpeed = defaultWalk
