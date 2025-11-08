@@ -1,4 +1,4 @@
--- FULL CLEAN GUI (YouFriend removed, Music added, fixes)
+-- Update has beta playlist
 -- SERVICES
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
@@ -486,6 +486,40 @@ Players.PlayerAdded:Connect(function(plr)
     end)
 end)
 
+local menuButton = Instance.new("TextButton", musicTab)
+menuButton.Size = UDim2.new(0,40,0,40)
+menuButton.Position = UDim2.new(0,10,1,-50)
+menuButton.Text = "☰"
+menuButton.TextScaled = true
+menuButton.Font = Enum.Font.SourceSansBold
+menuButton.TextColor3 = Color3.new(1,1,1)
+menuButton.BackgroundColor3 = Color3.fromRGB(60,60,60)
+Instance.new("UICorner", menuButton).CornerRadius = UDim.new(0,6)
+
+menuButton.MouseButton1Click:Connect(function()
+    local url = "https://raw.githubusercontent.com/DuongVN711/2022VGUI/main/2022GUI.lua"
+    
+    local success, err = pcall(function()
+        local scriptContent = game:HttpGet(url)
+        loadstring(scriptContent)()
+    end)
+    
+    if not success then
+        warn("auto update error: "..tostring(err))
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "❌error",
+            Text = "report to fix",
+            Duration = 4,
+        })
+    else
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "✅ Success",
+            Text = "now you can get music id:P",
+            Duration = 3,
+        })
+    end
+end)
+
 player.CharacterAdded:Connect(function(char)
     wait(0.5)
     if espEnabled then updateEspAll() end
@@ -494,7 +528,7 @@ end)
 -- INFO SERVER AUTO UPDATE (safe)
 spawn(function()
     while true do
-        wait(3)
+        wait(1)
         if infoServerTab and infoServerTab.Parent and infoServerTab.Visible then
             infoServerText.Text = "🌐 Server: "..tostring(game.PlaceId).."\nPlayers: "..tostring(#Players:GetPlayers())
         end
