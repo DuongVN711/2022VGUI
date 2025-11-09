@@ -497,7 +497,7 @@ menuButton.BackgroundColor3 = Color3.fromRGB(60,60,60)
 Instance.new("UICorner", menuButton).CornerRadius = UDim.new(0,6)
 
 menuButton.MouseButton1Click:Connect(function()
-    local url = "https://raw.githubusercontent.com/DuongVN711/2022VGUI/main/2022GUI.lua"
+    local url = "https://raw.githubusercontent.com/DuongVN711/2022VGUI/refs/heads/main/Music%20list.lua"
     
     local success, err = pcall(function()
         local scriptContent = game:HttpGet(url)
