@@ -146,7 +146,7 @@ infoText.Font = Enum.Font.FredokaOne
 infoText.TextColor3 = Color3.new(1, 1, 1)
 infoText.TextScaled = false
 infoText.TextSize = 16
-infoText.Text = "Script by 2022VCOOL\n\n- tiktok 2022Vcool\n- Script beta\n- ⚠️script not have bypass anticheat\n\nThx for using my GUI"
+infoText.Text = "Script by 2022VCOOL\n\n- 2022Vcool team\n- Script beta:P\n- ⚠️script not have bypass anticheat\n\nThx for using my GUI:P"
 infoText.BackgroundTransparency = 1
 
 -- InfoServer Tab
